@@ -294,6 +294,7 @@ BMP::BMP( BMP& Input )
 
 BMP::~BMP()
 {
+ /*
  int i;
  for(i=0;i<Width;i++)
  { delete [] Pixels[i]; }
@@ -305,7 +306,12 @@ BMP::~BMP()
  { delete [] MetaData1; }
  if( MetaData2 )
  { delete [] MetaData2; }
+ */
+ 
+ // Commented out because this seems to cause "double free or corruption (out)"
+ // with certain files. It should work just fine with the default behaviour.
 } 
+
 
 RGBApixel* BMP::operator()(int i, int j)
 {
