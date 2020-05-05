@@ -133,7 +133,5 @@ int main(int argc, char** argv)
         }
     }
 
-    printf("Finished!\n");
-
     return 0;
 }
