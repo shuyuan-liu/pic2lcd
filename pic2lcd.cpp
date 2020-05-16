@@ -141,9 +141,11 @@ int main(int argc, char** argv)
                 }
             }
 
-            printf (format_string.c_str(), this_byte);
+            printf(format_string.c_str(), this_byte);
         }
     }
+    
+    printf("\n");
 
     return 0;
 }
