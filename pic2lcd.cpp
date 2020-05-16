@@ -130,7 +130,6 @@ int main(int argc, char** argv)
     }
     format_string += delimiter;
     
-    bool first_value = true;
     for (size_t page = 0; page < height / 8; page++) {
         for (size_t col = 0; col < width; col++) {
             
@@ -142,11 +141,7 @@ int main(int argc, char** argv)
                 }
             }
 
-            if(!first_value) { printf ("%s", delimiter.c_str()); }
-
             printf (format_string.c_str(), this_byte);
-
-            first_value = false;
         }
     }
 
