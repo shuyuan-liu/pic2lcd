@@ -26,8 +26,8 @@ int main(int argc, char** argv)
     ValueArg<string> param_delimiter("d", "delimiter", "What goes between values in the output. Default: ', ', which outputs '0x55, 0xAA, ...'.", false, ", ", "delimiter");
     cmd.add(param_delimiter);
 
-    SwitchArg param_decimal("c", "decimal", "Output decimal values instead of hex.", false);
-    cmd.add(param_decimal);
+    ValueArg<int> param_base("b", "base", "Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.", false, 16, "10|16");
+    cmd.add(param_base);
 
     cmd.parse(argc, argv);
 
@@ -76,6 +76,7 @@ int main(int argc, char** argv)
     int *errors = new int[width * height];
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
+            
             size_t position = y * width + x;
             int luminance = image_greyscale[position] - errors[position];
             int error;
@@ -115,11 +116,24 @@ int main(int argc, char** argv)
     // Byte arrangement: vertical bytes, LSB up
     // 
     string delimiter = param_delimiter.getValue();
-    bool decimal = param_decimal.getValue();
+    string format_string;
+    switch (param_base.getValue()) {
+        case 10:
+            format_string = "%d";
+            break;
+        case 16:
+            format_string = "0x%02X";
+            break;
+        default:
+            fprintf(stderr, "The base has to be either 10 or 16.\n");
+            return 1;
+    }
+    format_string += delimiter;
+    
     bool first_value = true;
-
     for (size_t page = 0; page < height / 8; page++) {
         for (size_t col = 0; col < width; col++) {
+            
             uint_fast8_t this_byte = 0x00;
             for (uint_fast8_t bit = 0; bit < 8; bit++) {
                 size_t position = width * (page * 8 + bit) + col;
@@ -130,8 +144,7 @@ int main(int argc, char** argv)
 
             if(!first_value) { printf ("%s", delimiter.c_str()); }
 
-            if(decimal) { printf ("%d", this_byte); }
-            else { printf ("0x%02X", this_byte); }
+            printf (format_string.c_str(), this_byte);
 
             first_value = false;
         }
