@@ -14,3 +14,14 @@ A small utility that converts images to data that can be displayed on monochrome
 2. Clone this repo.
 3. `cd pic2lcd`
 4. `c++ pic2lcd.cpp EasyBMP/EasyBMP.cpp -o pic2lcd` (sorry no Makefile yet, will add in the future)
+
+## Options
+
+`-o <v|h>,  --byte-orientation <v|h>` Whether bytes are v (vertical) or h (horizontal) in the display's RAM. Default is vertical, which worked for SSD1306 and SH1106. ST7920 needs to use horizontal.
+
+`-b <10|16>,  --base <10|16>` Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.
+
+`-d <delimiter>,  --delimiter <delimiter>` What goes between values in the output. Default: ', ', which outputs '0x55, 0xAA, ...'.
+
+`-a <dither_alg>,  --dither-alg <dither_alg>` Select the dithering algorithm to dither the image with. Default: `floyd_steinberg`. Available: `jjn`, `floyd_steinberg`, `stucki`, `atikinson`, `burkes`, `sierra`, `sierra_2_row`, `sierra_lite`.
+

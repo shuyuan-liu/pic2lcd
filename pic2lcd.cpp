@@ -15,21 +15,59 @@ using namespace TCLAP;
 int main(int argc, char** argv)
 {
     // Set up command line options
-    CmdLine cmd("pic2lcd: Convert images into raw data for monochrome LCD screens like those driven by SSD1306, SH1106, ST7525, ST7920, etc.", ' ', "Build " __TIME__ " " __DATE__);
+    CmdLine cmd(
+        "pic2lcd: Convert images into raw data for monochrome LCD screens like those driven by SSD1306, SH1106, ST7525, ST7920, etc.",
+        ' ',
+        __TIME__ " " __DATE__
+    );
 
-    UnlabeledValueArg<string> param_image_file("image", "The image to convert", true, "", "path_to_image");
+    UnlabeledValueArg<string> param_image_file(
+        "image",
+        "The image to convert",
+        true,
+        "",
+        "path_to_image"
+    );
     cmd.add(param_image_file);
 
-    ValueArg<string> param_dither_algorithm("a", "dither-alg", "Select the dithering algorithm to dither the image with. Default: floyd_steinberg. Available: jjn, floyd_steinberg, stucki, atikinson, burkes, sierra, sierra_2_row, sierra_lite.", false, "floyd_steinberg", "dither_alg");
+    ValueArg<string> param_dither_algorithm(
+        "a",
+        "dither-alg",
+        "Select the dithering algorithm to dither the image with. Default: floyd_steinberg. Available: jjn, floyd_steinberg, stucki, atikinson, burkes, sierra, sierra_2_row, sierra_lite.",
+        false,
+        "floyd_steinberg",
+        "dither_alg"
+    );
     cmd.add(param_dither_algorithm);
 
-    ValueArg<string> param_delimiter("d", "delimiter", "What goes between values in the output. Default: ', ', which outputs '0x55, 0xAA, ...'.", false, ", ", "delimiter");
+    ValueArg<string> param_delimiter(
+        "d",
+        "delimiter",
+        "What goes between values in the output. Default: ', ', which outputs '0x55, 0xAA, ...'.",
+        false,
+        ", ",
+        "delimiter"
+    );
     cmd.add(param_delimiter);
 
-    ValueArg<int> param_base("b", "base", "Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.", false, 16, "10|16");
+    ValueArg<int> param_base(
+        "b",
+        "base",
+        "Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.",
+        false,
+        16,
+        "10|16"
+    );
     cmd.add(param_base);
     
-    ValueArg<char> param_byte_orientation("o", "byte-orientation", "Whether bytes are v (vertical) or h (horizontal) in the display's RAM. Default is vertical, which worked for SSD1306 and SH1106. ST7920 needs to use horizontal.", false, 'v', "v|h");
+    ValueArg<char> param_byte_orientation(
+        "o",
+        "byte-orientation",
+        "Whether bytes are v (vertical) or h (horizontal) in the display's RAM. Default is vertical, which worked for SSD1306 and SH1106. ST7920 needs to use horizontal.",
+        false,
+        'v',
+        "v|h"
+    );
     cmd.add(param_byte_orientation);
 
     cmd.parse(argc, argv);
@@ -133,7 +171,7 @@ int main(int argc, char** argv)
             return 1;
     }
     format_string += delimiter;
-    
+
     char byte_orientation = param_byte_orientation.getValue();
     if (byte_orientation == 'v') {
         for (size_t page = 0; page < height / 8; page++) {
@@ -150,6 +188,7 @@ int main(int argc, char** argv)
                 printf(format_string.c_str(), this_byte);
             }
         }
+
     } else if (byte_orientation == 'h') {
         for (size_t row = 0; row < height; row++) {
             for (size_t byte = 0; byte < width / 8; byte++) {
@@ -165,6 +204,7 @@ int main(int argc, char** argv)
                 printf(format_string.c_str(), this_byte);
             }
         }
+
     } else {
         fprintf(stderr, "Byte orientation must be either v or h.\n");
         return 1;
