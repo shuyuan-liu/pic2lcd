@@ -28,6 +28,9 @@ int main(int argc, char** argv)
 
     ValueArg<int> param_base("b", "base", "Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.", false, 16, "10|16");
     cmd.add(param_base);
+    
+    ValueArg<char> param_byte_orientation("o", "byte-orientation", "Whether bytes are v (vertical) or h (horizontal) in the display's RAM. Default is vertical, which worked for SSD1306 and SH1106. ST7920 needs to use horizontal.", false, 'v', "v|h");
+    cmd.add(param_byte_orientation);
 
     cmd.parse(argc, argv);
 
@@ -130,20 +133,41 @@ int main(int argc, char** argv)
             return 1;
     }
     format_string += delimiter;
+    
+    char byte_orientation = param_byte_orientation.getValue();
+    if (byte_orientation == 'v') {
+        for (size_t page = 0; page < height / 8; page++) {
+            for (size_t col = 0; col < width; col++) {
 
-    for (size_t page = 0; page < height / 8; page++) {
-        for (size_t col = 0; col < width; col++) {
-
-            uint_fast8_t this_byte = 0x00;
-            for (uint_fast8_t bit = 0; bit < 8; bit++) {
-                size_t position = width * (page * 8 + bit) + col;
-                if (image_greyscale[position]) {
-                    this_byte |= 1 << bit;
+                uint_fast8_t this_byte = 0x00;
+                for (uint_fast8_t bit = 0; bit < 8; bit++) {
+                    size_t position = width * (page * 8 + bit) + col;
+                    if (image_greyscale[position]) {
+                        this_byte |= 1 << bit;
+                    }
                 }
-            }
 
-            printf(format_string.c_str(), this_byte);
+                printf(format_string.c_str(), this_byte);
+            }
         }
+    } else if (byte_orientation == 'h') {
+        for (size_t row = 0; row < height; row++) {
+            for (size_t byte = 0; byte < width / 8; byte++) {
+
+                uint_fast8_t this_byte = 0x00;
+                for (uint_fast8_t bit = 0; bit < 8; bit++) {
+                    size_t position = width * row + byte * 8;
+                    if (image_greyscale[position]) {
+                        this_byte |= 1 << bit;
+                    }
+                }
+
+                printf(format_string.c_str(), this_byte);
+            }
+        }
+    } else {
+        fprintf(stderr, "Byte orientation must be either v or h.\n");
+        return 1;
     }
 
     printf("\n");
