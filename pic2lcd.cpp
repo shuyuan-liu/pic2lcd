@@ -164,7 +164,7 @@ int main(int argc, char** argv)
             format_string = "%d";
             break;
         case 16:
-            format_string = "0x%02X";
+            format_string = "0x%02x";
             break;
         default:
             fprintf(stderr, "The base has to be either 10 or 16.\n");
@@ -195,9 +195,9 @@ int main(int argc, char** argv)
 
                 uint_fast8_t this_byte = 0x00;
                 for (uint_fast8_t bit = 0; bit < 8; bit++) {
-                    size_t position = width * row + byte * 8;
+                    size_t position = width * row + byte * 8 + bit;
                     if (image_greyscale[position]) {
-                        this_byte |= 1 << bit;
+                        this_byte |= 0x80 >> bit;
                     }
                 }
 
