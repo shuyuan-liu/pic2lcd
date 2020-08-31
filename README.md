@@ -10,6 +10,12 @@ A small utility that converts images to data that can be displayed on monochrome
 
 ## Compiling
 
+Pic2lcd has only been compiled on Linux, but it should be compatible with Windows build environments with the proper headers set up.
+
+### Prerequisites
+
+
+
 1. Install the *tclap* library headers. On Arch Linux use `sudo pacman -S tclap`. For other distributions search for the corresponding package and install.
 2. Clone this repo.
 3. `cd pic2lcd`
