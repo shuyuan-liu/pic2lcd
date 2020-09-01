@@ -1,4 +1,4 @@
-# pic2lcd
+# Pic2lcd
 
 A small utility that converts images to data that can be displayed on monochrome OLED / LCD panels like those driven by SSD1306, SH1106 and ST7567.
 
