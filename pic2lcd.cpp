@@ -20,7 +20,7 @@ int main (int argc, char* argv[])
 	TCLAP::SwitchArg arg_lsb ("l", "lsb", "Place LSB towards the origin when outputing data", cmd, false);
 	TCLAP::ValueArg<string> arg_delimiter ("s", "delimiter", "Set the string that separates each value", false, ", ", "string", cmd);
 	TCLAP::ValueArg<int> arg_threshold ("t", "threshold", "The brightness value above which a pixel will be regarded as white", false, 127, "int", cmd);
-	TCLAP::ValueArg<string> arg_dither_algorithm ("a", "dither-algorithm", "The dithering algorithm to use.", false, "jjn", "string", cmd);
+	TCLAP::ValueArg<string> arg_algorithm ("a", "algorithm", "The dithering algorithm to use.", false, "jjn", "string", cmd);
 	TCLAP::UnlabeledValueArg<string> arg_image_file ("image-file", "Path to the image file to be processed", true, "", "image_file", cmd);
 	cmd.parse (argc, argv);
 
@@ -31,7 +31,7 @@ int main (int argc, char* argv[])
 	auto lsb = arg_lsb.getValue();
 	auto delimiter = arg_delimiter.getValue();
 	auto threshold = arg_threshold.getValue();
-	auto dither_algorithm = arg_dither_algorithm.getValue();
+	auto algorithm = arg_algorithm.getValue();
 	auto image_file = arg_image_file.getValue();
 
 
@@ -66,11 +66,11 @@ int main (int argc, char* argv[])
 
 	// Load the specified dithering algorithm
 	//
-	if (dither_algorithms.find(dither_algorithm) == dither_algorithms.end()) {
+	if (dither_algorithms.find(algorithm) == dither_algorithms.end()) {
 		fprintf (stderr, pic2lcd::ERR_DITHER_ALGORITHM);
 		exit (1);
 	}
-	auto dither_matrix = dither_algorithms[dither_algorithm];
+	auto dither_matrix = dither_algorithms[algorithm];
 
 
 	// Dither the image to black-and-white
