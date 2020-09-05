@@ -125,7 +125,11 @@ int main (int argc, char* argv[])
 				// !!! Make sure our target pixel is still inside the image
 				// otherwise we get sigmentation faults
 				//
-				if (x + dx < width && y + dy < height) {
+				if (x + dx >= 0 &&
+					y + dy >= 0 &&
+					x + dx < width &&
+					y + dy < height) 
+				{
 					int pos = (y + dy) * width + (x + dx);
 					errors[pos] += err * how_much;
 				}
