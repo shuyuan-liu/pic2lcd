@@ -160,6 +160,10 @@ int main (int argc, char* argv[])
 				if (x || y) {
 					printf ("%s", delimiter.c_str());
 				}
+
+				if (inverse) {
+					this_byte = ~this_byte & 0xFF;
+				}
 				
 				if (decimal) {
 					printf ("%d", this_byte);
@@ -183,6 +187,10 @@ int main (int argc, char* argv[])
 				// Print a delimiter except for the first byte
 				if (x || y) {
 					printf ("%s", delimiter.c_str());
+				}
+
+				if (inverse) {
+					this_byte = ~this_byte & 0xFF;
 				}
 				
 				if (decimal) {
