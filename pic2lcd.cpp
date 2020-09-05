@@ -22,6 +22,7 @@ int main (int argc, char* argv[])
 	TCLAP::ValueArg<int> arg_threshold ("t", "threshold", "The brightness value above which a pixel will be regarded as white", false, 127, "int", cmd);
 	TCLAP::ValueArg<string> arg_algorithm ("a", "algorithm", "The dithering algorithm to use.", false, "jjn", "string", cmd);
 	TCLAP::UnlabeledValueArg<string> arg_image_file ("image-file", "Path to the image file to be processed", true, "", "image_file", cmd);
+	TCLAP::SwitchArg arg_save_dithered ("r", "save-dithered", "Save the dithered image as dithered.png", cmd, false);
 	cmd.parse (argc, argv);
 
 	// Extract options into varaibles for easier use later
@@ -33,6 +34,7 @@ int main (int argc, char* argv[])
 	auto threshold = arg_threshold.getValue();
 	auto algorithm = arg_algorithm.getValue();
 	auto image_file = arg_image_file.getValue();
+	auto save_dithered = arg_save_dithered.getValue();
 
 
 	// Load the image
@@ -60,8 +62,6 @@ int main (int argc, char* argv[])
 			exit (2);
 		}
 	}
-
-	image.write ("greyscale.png");
 
 
 	// Load the specified dithering algorithm
@@ -137,7 +137,9 @@ int main (int argc, char* argv[])
 		}
 	}
 
-	image.write ("dithered.png");
+	if (save_dithered) {
+		image.write ("dithered.png");
+	}
 
 
 	// Output the processed image data
