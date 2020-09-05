@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = `libpng-config --cflags` -O3
+CXXFLAGS = `libpng-config --cflags` -O1
 LDFLAGS = `libpng-config --ldflags`
 
 HEADERS = *.h
