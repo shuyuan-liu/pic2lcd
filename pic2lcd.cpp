@@ -9,6 +9,18 @@
 
 using namespace std;
 
+void print_value (uint8_t value, bool inverse, bool decimal) {
+	if (inverse) {
+		value = ~value;
+	}
+
+	if (decimal) {
+		printf ("%d", value);
+	} else {
+		printf ("0x%02X", value);
+	}
+}
+
 
 int main (int argc, char* argv[])
 {
@@ -161,15 +173,7 @@ int main (int argc, char* argv[])
 					printf ("%s", delimiter.c_str());
 				}
 
-				if (inverse) {
-					this_byte = ~this_byte & 0xFF;
-				}
-				
-				if (decimal) {
-					printf ("%d", this_byte);
-				} else {
-					printf ("0x%02X", this_byte);
-				}
+				print_value (this_byte, inverse, decimal);
 			}
 		}
 	} else {
@@ -189,15 +193,7 @@ int main (int argc, char* argv[])
 					printf ("%s", delimiter.c_str());
 				}
 
-				if (inverse) {
-					this_byte = ~this_byte & 0xFF;
-				}
-				
-				if (decimal) {
-					printf ("%d", this_byte);
-				} else {
-					printf ("0x%02X", this_byte);
-				}
+				print_value (this_byte, inverse, decimal);
 			}
 		}
 	}
