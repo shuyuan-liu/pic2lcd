@@ -1,216 +1,195 @@
 #include <cstdio>
-#include <cmath>
 #include <cstdint>
 #include <string>
 #include <tclap/CmdLine.h>
-#include "EasyBMP/EasyBMP.h"
+#include <png++/png.hpp>
 
-#include "dither_matrix.h"
-#include "black_and_white.h"
+#include "strings.h"
+#include "dither_algorithms.h"
 
 using namespace std;
-using namespace TCLAP;
 
 
-int main(int argc, char** argv)
+int main (int argc, char* argv[])
 {
-    // Set up command line options
-    CmdLine cmd(
-        "pic2lcd: Convert images into raw data for monochrome LCD screens like those driven by SSD1306, SH1106, ST7525, ST7920, etc.",
-        ' ',
-        __TIME__ " " __DATE__
-    );
+	// Specify and parse command line options
+	TCLAP::CmdLine cmd (pic2lcd::DESCRIPTION, pic2lcd::OPTION_VALUE_DELIMITER, pic2lcd::VERSION);
+	TCLAP::SwitchArg arg_horizontal_bytes ("b", "horizonal-bytes", "Make bytes horizontal as in ST7920; default is vertical as in SSD1306", cmd, false);
+	TCLAP::SwitchArg arg_inverse ("i", "inverse", "Treat light pixels as 0 and dark pixels as 1", cmd, false);
+	TCLAP::SwitchArg arg_decimal ("d", "decimal", "Output decimal values instead of hexadecimal", cmd, false);
+	TCLAP::SwitchArg arg_lsb ("l", "lsb", "Place LSB towards the origin when outputing data", cmd, false);
+	TCLAP::ValueArg<string> arg_delimiter ("s", "delimiter", "Set the string that separates each value", false, ", ", "string", cmd);
+	TCLAP::ValueArg<int> arg_threshold ("t", "threshold", "The brightness value above which a pixel will be regarded as white", false, 127, "int", cmd);
+	TCLAP::ValueArg<string> arg_dither_algorithm ("a", "dither-algorithm", "The dithering algorithm to use.", false, "jjn", "string", cmd);
+	TCLAP::UnlabeledValueArg<string> arg_image_file ("image-file", "Path to the image file to be processed", true, "", "image_file", cmd);
+	cmd.parse (argc, argv);
 
-    UnlabeledValueArg<string> param_image_file(
-        "image",
-        "The image to convert",
-        true,
-        "",
-        "path_to_image"
-    );
-    cmd.add(param_image_file);
-
-    ValueArg<string> param_dither_algorithm(
-        "a",
-        "dither-alg",
-        "Select the dithering algorithm to dither the image with. Default: floyd_steinberg. Available: jjn, floyd_steinberg, stucki, atikinson, burkes, sierra, sierra_2_row, sierra_lite.",
-        false,
-        "floyd_steinberg",
-        "dither_alg"
-    );
-    cmd.add(param_dither_algorithm);
-
-    ValueArg<string> param_delimiter(
-        "d",
-        "delimiter",
-        "What goes between values in the output. Default: ', ', which outputs '0x55, 0xAA, ...'.",
-        false,
-        ", ",
-        "delimiter"
-    );
-    cmd.add(param_delimiter);
-
-    ValueArg<int> param_base(
-        "b",
-        "base",
-        "Which numerical base to use in the output. Can be 10 (decimal) or 16 (hex). Default is hex.",
-        false,
-        16,
-        "10|16"
-    );
-    cmd.add(param_base);
-    
-    ValueArg<char> param_byte_orientation(
-        "o",
-        "byte-orientation",
-        "Whether bytes are v (vertical) or h (horizontal) in the display's RAM. Default is vertical, which worked for SSD1306 and SH1106. ST7920 needs to use horizontal.",
-        false,
-        'v',
-        "v|h"
-    );
-    cmd.add(param_byte_orientation);
-
-    cmd.parse(argc, argv);
+	// Extract options into varaibles for easier use later
+	auto horizontal_bytes = arg_horizontal_bytes.getValue();
+	auto inverse = arg_inverse.getValue();
+	auto decimal = arg_decimal.getValue();
+	auto lsb = arg_lsb.getValue();
+	auto delimiter = arg_delimiter.getValue();
+	auto threshold = arg_threshold.getValue();
+	auto dither_algorithm = arg_dither_algorithm.getValue();
+	auto image_file = arg_image_file.getValue();
 
 
-    // Read the image
-    BMP image;
-    if(!image.ReadFromFile(param_image_file.getValue().c_str())) {
-        fprintf(stderr, "Error opening the image file.\n");
-        return 1;
-    }
-    size_t width = image.TellWidth();
-    size_t height = image.TellHeight();
+	// Load the image
+	//
+	// We specify the numbers of channels as 1 so that the image will be
+	// converted to greyscale on load
+	//
+	// depth: Unused, just required by the load function
+	//
+	png::image<png::gray_pixel> image (image_file);
+	int width = image.get_width();
+	int height = image.get_height();
 
-    // Select the specified diterhing algorithm
-    if(dither_matrices.find(param_dither_algorithm.getValue().c_str()) == dither_matrices.end()) {
-        fprintf(stderr, "The dithering algorithm specified is not one of those available.\n");
-        fprintf(stderr, "Available algorithms: jjn, floyd_steinberg, stucki, atikinson, burkes, sierra, sierra_2_row, sierra_lite.\n");
-        return 1;
-    }
-    auto dither_matrix = dither_matrices[param_dither_algorithm.getValue().c_str()];
+	// The width or height of the image must be multiples of 8, depending on
+	// the byte orientation selected
+	//
+	if (horizontal_bytes) {
+		if (width % 8 != 0) {
+			fprintf (stderr, pic2lcd::ERR_WIDTH_NOT_MULTIPLE_OF_8);
+			exit (2);
+		}
+	} else {
+		if (height % 8 != 0) {
+			fprintf (stderr, pic2lcd::ERR_HEIGHT_NOT_MULTIPLE_OF_8);
+			exit (2);
+		}
+	}
 
-    // Convert the image into greyscale
-    //
-    // image_greyscale: an array with the same size as the input image, storing
-    //                  the luminance (brightness) values of the pixels. Each
-    //                  pixel in the original image will have one luminance
-    //                  value here. Therefore an input image of size 128x64
-    //                  will give an image_greyscale with 128*64 elements.
-    //
-    uint_fast8_t *image_greyscale = new uint_fast8_t[width * height];
-    for (size_t y = 0; y < height; y++) {
-        for (size_t x = 0; x < width; x++) {
-            image_greyscale[y * width + x] = image(x, y)->Red * 0.3 +
-                                             image(x, y)->Green * 0.59 +
-                                             image(x, y)->Blue * 0.11;
-        }
-    }
+	image.write ("greyscale.png");
 
-    // Dither the image to black-and-white
-    //
-    // errors: an array with the same size as the image storing the errors
-    //         added to it by its beighbouring pixels. When determining
-    //         whether a pixel will be white / black in the final image, 
-    //         the value of (the pixel's luminance + added error) is used
-    //         instead of the luminance itself.
-    // 
-    int *errors = new int[width * height];
-    for (size_t y = 0; y < height; y++) {
-        for (size_t x = 0; x < width; x++) {
 
-            size_t position = y * width + x;
-            int luminance = image_greyscale[position] - errors[position];
-            int error;
+	// Load the specified dithering algorithm
+	//
+	if (dither_algorithms.find(dither_algorithm) == dither_algorithms.end()) {
+		fprintf (stderr, pic2lcd::ERR_DITHER_ALGORITHM);
+		exit (1);
+	}
+	auto dither_matrix = dither_algorithms[dither_algorithm];
 
-            if (luminance > 127) {
-                image_greyscale[position] = 255;
-                error = 255 - luminance;
-            } else {
-                image_greyscale[position] = 0;
-                error = 0 - luminance;
-            }
 
-            // Distribute the error according to the dither_matrix
-            //
-            // spread: an element in the dither matrix that specifies how
-            //         much of the error is added to one of the neighbouring
-            //         pixels.
-            //
-            // dither_matrix: the collection of "spread"s that defines how the
-            //                error on the current pixel is divided and added
-            //                to its neighbouring pixels.
-            //
-            for (const auto& spread : dither_matrix) {
-                int x_offset,  y_offset;
-                double proportion;
-                tie(x_offset, y_offset, proportion) = spread;
+	// Dither the image to black-and-white
+	//
+	// errors: Stores the error value (produced when processing neibouring
+	//         pixels) to be taken into account for each pixel. Has the same
+	//         size as the image.
+	//
+	double* errors = new double[width * height]();
 
-                int position = width * (y + y_offset) + (x + x_offset);
-                errors[position] += error * proportion;
-            }
-        }
-    }
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			
+			// We need to subtract the error spread to this pixel when
+			// considering its brightness, to compensate for its neighbouring
+			// pixels being "forced" to 0 or 255 from their original colours
+			//
+			// The reason for subtraction instead of addition is that an error
+			// needs to be compensated by adjusting other pixels in the
+			// opposite direction. For example, when a pixel is forced from 200
+			// to 255, there is a positive error because 255 is brighter than
+			// its real value. By subtracting from (darkening) its neighbouring
+			// pixels, this error can be compensated for.
+			//
+			int pos = y * width + x;
+			double value = image[y][x] - errors[pos];
+			double err;
 
-    // Convert the dithered image to a list of values, each representing
-    // 8 pixels (1 byte of data).
-    //
-    // Byte arrangement: vertical bytes, LSB up
-    //
-    string delimiter = param_delimiter.getValue();
-    string format_string;
-    switch (param_base.getValue()) {
-        case 10:
-            format_string = "%d";
-            break;
-        case 16:
-            format_string = "0x%02x";
-            break;
-        default:
-            fprintf(stderr, "The base has to be either 10 or 16.\n");
-            return 1;
-    }
-    format_string += delimiter;
+			// !!! The brightness value used when calculating the error is the
+			// brightness value AFTER errors have been added, not before !!!
+			//
+			if (value > threshold) {
+				image[y][x] = 255;
+				err = 255 - value;
+			} else {
+				image[y][x] = 0;
+				err = 0 - value;
+			}
 
-    char byte_orientation = param_byte_orientation.getValue();
-    if (byte_orientation == 'v') {
-        for (size_t page = 0; page < height / 8; page++) {
-            for (size_t col = 0; col < width; col++) {
+			// Spread this pixel's error to neighbouring pixels
+			//
+			// dither_matrix_element: An element in the dithering matrix
+			//                        specifying one neighbouring pixel that
+			//                        the error should be spread to, and how
+			//                        much
+			//
+			for (auto dither_matrix_element : dither_matrix) {
+				int dx, dy;
+				double how_much;
+				tie(dx, dy, how_much) = dither_matrix_element;
 
-                uint_fast8_t this_byte = 0x00;
-                for (uint_fast8_t bit = 0; bit < 8; bit++) {
-                    size_t position = width * (page * 8 + bit) + col;
-                    if (image_greyscale[position]) {
-                        this_byte |= 1 << bit;
-                    }
-                }
+				// !!! Make sure our target pixel is still inside the image
+				// otherwise we get sigmentation faults
+				//
+				if (x + dx < width && y + dy < height) {
+					int pos = (y + dy) * width + (x + dx);
+					errors[pos] += err * how_much;
+				}
+			}
+		}
+	}
 
-                printf(format_string.c_str(), this_byte);
-            }
-        }
+	image.write ("dithered.png");
 
-    } else if (byte_orientation == 'h') {
-        for (size_t row = 0; row < height; row++) {
-            for (size_t byte = 0; byte < width / 8; byte++) {
 
-                uint_fast8_t this_byte = 0x00;
-                for (uint_fast8_t bit = 0; bit < 8; bit++) {
-                    size_t position = width * row + byte * 8 + bit;
-                    if (image_greyscale[position]) {
-                        this_byte |= 0x80 >> bit;
-                    }
-                }
+	// Output the processed image data
+	//
+	if (horizontal_bytes) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x += 8) {
+				
+				unsigned char this_byte = 0;
+				for (int bit = 0; bit < 8; bit++) {
+					int pos = y * width + x + bit;
+					if (image[y][x+bit]) {
+						this_byte |= (lsb ? (1 << bit) : (0x80 >> bit));
+					}
+				}
 
-                printf(format_string.c_str(), this_byte);
-            }
-        }
+				// Print a delimiter except for the first byte
+				if (x || y) {
+					printf ("%s", delimiter.c_str());
+				}
+				
+				if (decimal) {
+					printf ("%d", this_byte);
+				} else {
+					printf ("0x%02X", this_byte);
+				}
+			}
+		}
+	} else {
+		for (int y = 0; y < height; y += 8) {
+			for (int x = 0; x < width; x++) {
+				
+				unsigned char this_byte = 0;
+				for (int bit = 0; bit < 8; bit++) {
+					int pos = (y + bit) * width + x;
+					if (image[y+bit][x]) {
+						this_byte |= (lsb ? (1 << bit) : (0x80 >> bit));
+					}
+				}
 
-    } else {
-        fprintf(stderr, "Byte orientation must be either v or h.\n");
-        return 1;
-    }
+				// Print a delimiter except for the first byte
+				if (x || y) {
+					printf ("%s", delimiter.c_str());
+				}
+				
+				if (decimal) {
+					printf ("%d", this_byte);
+				} else {
+					printf ("0x%02X", this_byte);
+				}
+			}
+		}
+	}
 
-    printf("\n");
+	printf ("\n");
 
-    return 0;
+	exit (0);
 }
+

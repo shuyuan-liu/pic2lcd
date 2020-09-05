@@ -11,8 +11,9 @@ using namespace std;
 // processed, and never to those that have (pushing the error to processed
 // pixels makes no difference as we will not touch those pixels ever again.
 //
-// The following website lists several dithering algorithms 
+// The following web page lists several dithering algorithms:
 // https://tannerhelland.com/2012/12/28/dithering-eleven-algorithms-source-code.html
+//
 // The default dithering algorithm used by pic2lcd is JJN (Jarvis, Judice, and
 // Ninke), as follows:
 //     _ _ X 7 5
@@ -29,7 +30,7 @@ using namespace std;
 //     how_much: what fraction of the error is ditributed to the pixel specified by
 //         x_offset and y_offset.
 
-map<string, vector<tuple<unsigned int, unsigned int, double>>> dither_matrices = {
+map<string, vector<tuple<int, int, double> > > dither_algorithms = {
 
     {"jjn",{
         { 1, 0, 7 / 48.0},
