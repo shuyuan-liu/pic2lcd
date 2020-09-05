@@ -19,7 +19,7 @@ Pic2lcd has only been compiled on Linux, but it should be compatible with Window
 1. Install the *tclap* and *png++* library headers. This should be available from your distro's repositories.
 2. Clone this repo.
 3. `cd pic2lcd`
-4.  `make`
+4. `make`
 
 ## Options
 
