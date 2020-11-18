@@ -1,13 +1,13 @@
 # Pic2lcd
 
-A small utility that converts images to data that can be displayed on monochrome OLED / LCD panels like those driven by SSD1306, SH1106 and ST7920. Pic2lcd can only process png images currently.
+A small utility that converts images to data that can be displayed on monochrome OLED / LCD panels like those driven by SSD1306, SH1106 and ST7920. Currently, this program can only take png images, and is compatible with only monochrome displays.
 
 ## Features
 
 - Performs dithering on the image. The default algorithm is Jarvis, Judice, and Ninke (jjn), with a number of other options.
-- Can output either hex values or decimal values. Python users that read the output with the *csv* library might find the decimal format easier to work with.
+- Outputs either hex values or decimal values. Python users that read the output with the *csv* library might find the decimal format easier to work with.
 - Customisable value delimiter. The default is a comma plus a space, which produces `0x95, 0x40, ...`. You can change this with the `--delimiter` option.
-- Can provide data for screens with both vertical bytes in memory (e.g. SSD1306) and horizontal bytes (e.g. ST7920).
+- Compatible with screens with both vertical bytes in memory (e.g. SSD1306) and horizontal bytes (e.g. ST7920).
 - Bit order (LSB / MSB) can be changed.
 
 ## Compiling
