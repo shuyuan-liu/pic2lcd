@@ -18,7 +18,7 @@ int main (int argc, char *argv[])
     app.add_option ("-i, --invert", invert, "Invert the output (swap black and white)");
     
     bool bytes_vertical = false;
-    app.add_option ("-v, --bytes-vertical", bytes_vertical, "Treat each 8 vertically adjacent pixels as one byte");
+    app.add_option ("-v, --bytes-vertical", bytes_vertical, "Treat every 8 pixels in a column (instead of in a row) as one byte");
     
     bool lsb_first = false;
     app.add_option ("-l, --lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
