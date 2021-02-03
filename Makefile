@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = `libpng-config --cflags` -O1
+CXXFLAGS = `libpng-config --cflags` -O2
 LDFLAGS = `libpng-config --ldflags`
 
 HEADERS = *.h
@@ -14,5 +14,3 @@ pic2lcd.o: pic2lcd.cpp $(HEADERS)
 
 clean:
 	rm -rf pic2lcd pic2lcd.o
-
-remake: clean pic2lcd

@@ -1,4 +1,4 @@
 pic2lcd
 *.o
 *.png
-*.jpg
+compile_commands.json
