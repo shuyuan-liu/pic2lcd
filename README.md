@@ -21,7 +21,7 @@ I use the [Tup](https://github.com/gittup/tup) build system because it’s simpl
 Usage: pic2lcd [OPTIONS] [image]
 
 Positionals:
-  image                        Path to a png image to be converted
+  image                        Path to the image to be converted (png only)
 
 Options:
   -h, --help                   Print this help message and exit

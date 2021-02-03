@@ -12,19 +12,19 @@ int main (int argc, char *argv[])
     CLI::App app {"Convert an image to monochrome bitmap data"};
 
     std::string image_file = "";
-    app.add_option ("image", image_file, "Path to a png image to be converted") -> check (CLI::ExistingFile);
+    app.add_option ("image", image_file, "Path to the image to be converted (png only)") -> check (CLI::ExistingFile);
     
     bool invert = false;
-    app.add_option ("-i,--invert", invert, "Invert the output (swap black and white)");
+    app.add_option ("-i, --invert", invert, "Invert the output (swap black and white)");
     
     bool bytes_vertical = false;
-    app.add_option ("-v,--bytes-vertical", bytes_vertical, "Treat each 8 vertically adjacent pixels as one byte");
+    app.add_option ("-v, --bytes-vertical", bytes_vertical, "Treat each 8 vertically adjacent pixels as one byte");
     
     bool lsb_first = false;
-    app.add_option ("-l,--lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
+    app.add_option ("-l, --lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
 
     bool columns_first = false;
-    app.add_option ("-c,--columns-first", columns_first, "Go up-to-down then left-to-right");
+    app.add_option ("-c, --columns-first", columns_first, "Go up-to-down then left-to-right");
 
     CLI11_PARSE(app, argc, argv);
 
