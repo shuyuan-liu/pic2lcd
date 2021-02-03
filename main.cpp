@@ -1,9 +1,8 @@
-#include <CLI/App.hpp>
-#include <exception>
-#include <fmt/core.h>
 #include <CLI/CLI.hpp>
+#include <fmt/core.h>
 #include <png++/png.hpp>
 #include <string>
+#include <exception>
 #include "reverse_byte.h"
 
 int main (int argc, char *argv[])
