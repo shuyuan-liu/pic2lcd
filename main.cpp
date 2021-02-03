@@ -3,7 +3,7 @@
 #include <png++/png.hpp>
 #include <string>
 #include <exception>
-#include "reverse_byte.h"
+#include "reverse_byte.hpp"
 
 int main (int argc, char *argv[])
 {
