@@ -1,6 +1,6 @@
-CXX = c++
-CXXFLAGS = `libpng-config --cflags` -O2
-LDFLAGS = `libpng-config --ldflags`
+CXX = clang++
+CXXFLAGS = `libpng-config --cflags` -O1
+LDFLAGS = `libpng-config --ldflags` -lfmt
 OUTPUT = pic2lcd
 
 : foreach *.cpp |> $(CXX) -c %f -o %o $(CXXFLAGS) |> %B.o
