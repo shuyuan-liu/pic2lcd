@@ -1,6 +1,9 @@
 .tup
 .vscode
+.cache
 compile_commands.json
 
 *.o
 pic2lcd
+
+*.png
