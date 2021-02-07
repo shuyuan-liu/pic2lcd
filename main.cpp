@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
         if (i != 0) {
             fmt::print (", ");
         }
-        fmt::print ("0x{:02X}", bytes[i]);
+        fmt::print ("{:#04x}", bytes[i]);
     }
     fmt::print ("\n");
 
