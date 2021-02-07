@@ -18,20 +18,18 @@ I use the [Tup](https://github.com/gittup/tup) build system because it’s simpl
 ## Command-line options
 
 ```
-Usage: ./pic2lcd [OPTIONS] [image]
+Usage: pic2lcd [OPTIONS] [image]
 
 Positionals:
   image TEXT:FILE             Path to the image to be converted (png only)
 
 Options:
   -h,--help                   Print this help message and exit
-  -i,--invert BOOLEAN         Invert the output (swap black and white)
-  -v,--bytes-vertical BOOLEAN Treat every 8 pixels in a column (instead of in a row) as one byte
-  -l,--lsb-first BOOLEAN      Output bytes with LSB closer to the origin
-  -c,--columns-first BOOLEAN  Go up-to-down then left-to-right
+  -i,--invert                 Invert the output (swap black and white)
+  -v,--bytes-vertical         Treat every 8 pixels in a column (instead of in a row) as one byte
+  -l,--lsb-first              Output bytes with LSB closer to the origin
+  -c,--columns-first          Go up-to-down then left-to-right
 ```
-
-“BOOLEAN” means either `true` or `false`.
 
 ## Where did the dithering go?
 
