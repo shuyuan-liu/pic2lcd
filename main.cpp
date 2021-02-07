@@ -1,5 +1,5 @@
 #include <CLI/CLI.hpp>
-#include <fmt/core.h>
+#include <cstdio>
 #include <png++/png.hpp>
 #include <string>
 #include <exception>
@@ -14,16 +14,16 @@ int main (int argc, char *argv[])
     app.add_option ("image", image_file, "Path to the image to be converted (png only)") -> check (CLI::ExistingFile);
     
     bool invert = false;
-    app.add_option ("-i, --invert", invert, "Invert the output (swap black and white)");
+    app.add_flag ("-i, --invert", invert, "Invert the output (swap black and white)");
     
     bool bytes_vertical = false;
-    app.add_option ("-v, --bytes-vertical", bytes_vertical, "Treat every 8 pixels in a column (instead of in a row) as one byte");
+    app.add_flag ("-v, --bytes-vertical", bytes_vertical, "Treat every 8 pixels in a column (instead of in a row) as one byte");
     
     bool lsb_first = false;
-    app.add_option ("-l, --lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
+    app.add_flag ("-l, --lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
 
     bool columns_first = false;
-    app.add_option ("-c, --columns-first", columns_first, "Go up-to-down then left-to-right");
+    app.add_flag ("-c, --columns-first", columns_first, "Go up-to-down then left-to-right");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
     try {
         image.read(image_file);
     } catch (const std::exception &e) {
-        fmt::print(stderr, "Failed to open image file: {}\n", e.what());
+        fprintf(stderr, "Failed to open image file: %s\n", e.what());
         return 1;
     }
     int width = image.get_width ();
@@ -42,10 +42,10 @@ int main (int argc, char *argv[])
 
     // Make sure image size fits a whole number of bytes, if not then quit
     if (bytes_vertical && height % 8 != 0) {
-        fmt::print (stderr, "The height of the image must be a multiple of 8\n");
+        fprintf (stderr, "The height of the image must be a multiple of 8\n");
         return 2;
     } else if (width % 8 != 0) {
-        fmt::print (stderr, "The width of the image must be a multiple of 8\n");
+        fprintf (stderr, "The width of the image must be a multiple of 8\n");
         return 2;
     }
 
@@ -119,11 +119,11 @@ int main (int argc, char *argv[])
     for (int i = 0; i < width * height / 8; i++) {
         // Don't put a comma in front of the first value
         if (i != 0) {
-            fmt::print (", ");
+            printf (", ");
         }
-        fmt::print ("{:#04x}", bytes[i]);
+        printf ("0x%02X", bytes[i]);
     }
-    fmt::print ("\n");
+    printf ("\n");
 
 
     // Tidy up
