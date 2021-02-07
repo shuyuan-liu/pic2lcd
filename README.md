@@ -33,3 +33,8 @@ Options:
 
 “BOOLEAN” means either `true` or `false`.
 
+## Where did the dithering go?
+
+This program used to also perform dithering on the image, but I decided to remove the feature because it can already be done by programs like [imagemagick](https://imagemagick.org/index.php). To dither an image to black-and-white with imagemagick, use the following command:
+
+`convert image.png -monochrome -dither FloydSteinberg dithered-image.png`
