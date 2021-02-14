@@ -4,6 +4,8 @@
 #include <string>
 #include <exception>
 #include "reverse_byte.hpp"
+#include "dither.hpp"
+
 
 int main (int argc, char *argv[])
 {
@@ -24,6 +26,9 @@ int main (int argc, char *argv[])
 
     bool columns_first = false;
     app.add_flag ("-c, --columns-first", columns_first, "Go up-to-down then left-to-right");
+
+    bool do_dither = false;
+    app.add_flag ("-d, --dither", do_dither, "Perform dithering on the image before converting");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -47,6 +52,12 @@ int main (int argc, char *argv[])
     } else if (width % 8 != 0) {
         fprintf (stderr, "The width of the image needs to be a multiple of 8\n");
         return 2;
+    }
+
+
+    if (do_dither) {
+        dither(image);
+        image.write("dithered.png");
     }
 
 
