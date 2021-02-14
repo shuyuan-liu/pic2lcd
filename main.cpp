@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
     try {
         image.read(image_file);
     } catch (const std::exception &e) {
-        fprintf(stderr, "Failed to open image file: %s\n", e.what());
+        fprintf(stderr, "Failed to load image: %s\n", e.what());
         return 1;
     }
     int width = image.get_width ();
@@ -42,10 +42,10 @@ int main (int argc, char *argv[])
 
     // Make sure image size fits a whole number of bytes, if not then quit
     if (bytes_vertical && height % 8 != 0) {
-        fprintf (stderr, "The height of the image must be a multiple of 8\n");
+        fprintf (stderr, "The height of the image needs to be a multiple of 8\n");
         return 2;
     } else if (width % 8 != 0) {
-        fprintf (stderr, "The width of the image must be a multiple of 8\n");
+        fprintf (stderr, "The width of the image needs to be a multiple of 8\n");
         return 2;
     }
 
