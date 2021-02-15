@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = `libpng-config --cflags` -O3
+CXXFLAGS = `libpng-config --cflags` -O2
 LDFLAGS = `libpng-config --ldflags`
 OUTPUT = pic2lcd
 
