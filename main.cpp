@@ -10,25 +10,28 @@
 int main (int argc, char *argv[])
 {
     // Set up command-line options
-    CLI::App app {"Convert an image to monochrome bitmap data"};
+    CLI::App app {"Convert a png image to monochrome bitmap data for LCD / OLED controllers"};
 
-    std::string image_file = "";
-    app.add_option ("image", image_file, "Path to the image to be converted (png only)") -> check (CLI::ExistingFile);
+    std::string image_path = "";
+    app.add_option ("image", image_path, "Path to a png image to be converted") -> check (CLI::ExistingFile);
+
+    std::string dithered_image_path = "";
+    app.add_option ("dithered_image", dithered_image_path, "If given, save dithered image to the path specified");
     
     bool invert = false;
-    app.add_flag ("-i, --invert", invert, "Invert the output (swap black and white)");
+    app.add_flag ("-i, --invert", invert, "Invert output, i.e. swap black and white");
     
     bool bytes_vertical = false;
-    app.add_flag ("-v, --bytes-vertical", bytes_vertical, "Treat every 8 pixels in a column (instead of in a row) as one byte");
+    app.add_flag ("-v, --bytes-vertical", bytes_vertical, "Group every 8 pixels in a column (instead of in a row) as a byte");
     
     bool lsb_first = false;
-    app.add_flag ("-l, --lsb-first", lsb_first, "Output bytes with LSB closer to the origin");
+    app.add_flag ("-l, --lsb-first", lsb_first, "Output bytes with LSB towards the origin");
 
     bool columns_first = false;
-    app.add_flag ("-c, --columns-first", columns_first, "Go up-to-down then left-to-right");
+    app.add_flag ("-c, --columns-first", columns_first, "Go column by column insetad of row by row");
 
     bool do_dither = false;
-    app.add_flag ("-d, --dither", do_dither, "Perform dithering on the image before converting");
+    app.add_flag ("-d, --dither", do_dither, "Perform dithering before converting");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -36,9 +39,9 @@ int main (int argc, char *argv[])
     // Load image, quit on any error
     png::image<png::gray_pixel> image;
     try {
-        image.read(image_file);
+        image.read(image_path);
     } catch (const std::exception &e) {
-        fprintf(stderr, "Failed to load image: %s\n", e.what());
+        fprintf (stderr, "Couldn't load image: %s\n", e.what());
         return 1;
     }
     int width = image.get_width ();
@@ -57,11 +60,19 @@ int main (int argc, char *argv[])
 
     if (do_dither) {
         dither(image);
-        image.write("dithered.png");
+
+        if (dithered_image_path != "") {
+            try {
+                image.write(dithered_image_path);
+            } catch (const std::exception &e) {
+                fprintf (stderr, "Couldn't save dithered image: %s\n", e.what());
+                return 3;
+            }
+        }
     }
 
 
-    // Fill output bytes into an array in the sequence that they will be output
+    // Fill output bytes into an array in the sequence that they will be printed
     unsigned char *bytes = new unsigned char[width * height / 8];
 
     if (bytes_vertical) {
@@ -126,7 +137,7 @@ int main (int argc, char *argv[])
     }
 
 
-    // Output data
+    // Print data
     for (int i = 0; i < width * height / 8; i++) {
         // Don't put a comma in front of the first value
         if (i != 0) {
