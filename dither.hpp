@@ -6,18 +6,21 @@
 #include <tuple>
 
 
-// 
+// Using the "JJN" dithering matrix. Source:
+// https://tannerhelland.com/2012/12/28/dithering-eleven-algorithms-source-code.html
 const std::map<std::pair<int, int>, double> dither_matrix = {
-    {{ 1,  0}, (double) 5 / 32},
-    {{ 2,  0}, (double) 3 / 32},
-    {{-2,  1}, (double) 2 / 32},
-    {{-1,  1}, (double) 4 / 32},
-    {{ 0,  1}, (double) 5 / 32},
-    {{ 1,  1}, (double) 4 / 32},
-    {{ 2,  1}, (double) 2 / 32},
-    {{-1,  2}, (double) 2 / 32},
-    {{ 0,  2}, (double) 3 / 32},
-    {{ 1,  2}, (double) 2 / 32},
+    {{ 1,  0}, (double) 7 / 48},
+    {{ 2,  0}, (double) 5 / 48},
+    {{-2,  1}, (double) 3 / 48},
+    {{-1,  1}, (double) 5 / 48},
+    {{ 0,  1}, (double) 7 / 48},
+    {{ 1,  1}, (double) 5 / 48},
+    {{ 2,  1}, (double) 3 / 48},
+    {{-2,  2}, (double) 1 / 48},
+    {{-1,  2}, (double) 3 / 48},
+    {{ 0,  2}, (double) 5 / 48},
+    {{ 1,  2}, (double) 3 / 48},
+    {{ 2,  2}, (double) 1 / 48},
 };
 
 
