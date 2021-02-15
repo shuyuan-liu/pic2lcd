@@ -17,24 +17,25 @@ I use the [Tup](https://github.com/gittup/tup) build system because it’s simpl
 ## Command-line options
 
 ```
-Usage: pic2lcd [OPTIONS] [image]
+Usage: pic2lcd [OPTIONS] [image] [dithered_image]
 
 Positionals:
   image TEXT:FILE             Path to a png image to be converted
+  dithered_image TEXT         If given, save dithered image to the path specified
 
 Options:
   -h,--help                   Print this help message and exit
-  -i,--invert                 Invert the output (swap black and white)
-  -v,--bytes-vertical         Treat every 8 pixels in a column, instead of in a row, as one byte
-  -l,--lsb-first              Output bytes with LSB closer to the origin
-  -c,--columns-first          Go up-to-down then left-to-right
-  -d,--dither                 Perform dithering on the image before converting
+  -i,--invert                 Invert output, i.e. swap black and white
+  -v,--bytes-vertical         Group every 8 pixels in a column (instead of in a row) as a byte
+  -l,--lsb-first              Output bytes with LSB towards the origin
+  -c,--columns-first          Go column by column insetad of row by row
+  -d,--dither                 Perform dithering before converting
 ```
 
 ## About dithering
 
-I had initially removed dithering from pic2lcd because other programs like ImageMagick could already do the job. However, for the following reasons I have added back dithering:
+I had initially removed dithering from pic2lcd because programs like ImageMagick could already do the job. However, for the following reasons I have now added back dithering:
 
-- ImageMagick is slow at dithering. On my laptop, dithering a 256x128 image 100 times *and* saving the hex data takes pic2lcd 1.4s, while ImageMagick needs 3.4s just for dithering alone.
-- ImageMagick by default adjusts the image's contrast automatically, which I don't want it to do.
-- It's programming practice for me
+- ImageMagick is slow for dithering. On my laptop, dithering a 256x128 image 100 times *and* saving the hex output takes pic2lcd only 1.4s, while ImageMagick needs 3.4s just for dithering alone.
+- ImageMagick automatically adjusts the image's contrast, which I don't want it to do.
+- It's programming practice for me.
