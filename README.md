@@ -1,13 +1,13 @@
 # Pic2lcd
 
-Converts images to bitmap data that can be fed to monochrome OLED / LCD panels driven by SSD1306, SH1106, ST7920 and the like. See below for configuration options available.
+Converts images to bitmap data that can be fed to monochrome OLED / LCD panels driven by SSD1306, SH1106, ST7920 and the like. See below for available configuration options.
 
 ## Compiling
 
-I use the [Tup](https://github.com/gittup/tup) build system because it’s simple but useful enough for this small project.
+I use the Tup build system as it’s simple and powerful enough for this small project.
 
 1. Install [Tup](https://github.com/gittup/tup).
-2. Install the following headers:
+2. Install the following libraries:
     - [CLI11](https://github.com/CLIUtils/CLI11)
     - [png++](https://www.nongnu.org/pngpp/)
 3. `git clone <this repo>`
