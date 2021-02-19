@@ -7,9 +7,7 @@ Converts images to bitmap data that can be fed to monochrome OLED / LCD panels d
 I use the Tup build system as it’s simple and powerful enough for this small project.
 
 1. Install [Tup](https://github.com/gittup/tup).
-2. Install the following libraries:
-    - [CLI11](https://github.com/CLIUtils/CLI11)
-    - [png++](https://www.nongnu.org/pngpp/)
+2. Install the [CLI11](https://github.com/CLIUtils/CLI11) and [png++](https://www.nongnu.org/pngpp/) libraries.
 3. `git clone <this repo>`
 4. `cd pic2lcd`
 5. `tup`
