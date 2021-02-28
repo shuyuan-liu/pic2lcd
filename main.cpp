@@ -1,6 +1,6 @@
 #include <CLI/CLI.hpp>
-#include <cstdio>
 #include <png++/png.hpp>
+#include <cstdio>
 #include <string>
 #include <exception>
 #include "reverse_byte.hpp"
