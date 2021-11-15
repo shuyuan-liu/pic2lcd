@@ -1,3 +1,5 @@
+> This repo has been archived. There probably won't be any significant development in the future.
+
 # Pic2lcd
 
 Converts images to bitmap data that can be fed to monochrome OLED / LCD panels driven by SSD1306, SH1106, ST7920 and the like. See below for available configuration options.
