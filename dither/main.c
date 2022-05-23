@@ -14,8 +14,10 @@
 
 int main(int argc, char* argv[])
 {
+    // Prepare ----------------------------------------------------------------
+    
     if (argc != 4) {
-        fprintf(stderr, "Usage: %s <quantize_to_n_bits> <input_image> <output.png>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <quantize_to_bitdepth> <input_image> <output.png>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -42,12 +44,11 @@ int main(int argc, char* argv[])
     // Dithering --------------------------------------------------------------
 
     int shift_dist = 8 - quantized_num_bits;
-    int scale_to_255 = 1 / (pow(2, quantized_num_bits) - 1) * 255.0f;
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             double p_in = img_in[y * width + x] - errs[y * width + x];
-            uint8_t p_out = quantize_to_n_bits(p_in, quantized_num_bits);
+            uint8_t p_out = quantize_to_bitdepth(p_in, quantized_num_bits);
             double p_err = p_out - p_in;
 
             img_out[y * width + x] = p_out;
